@@ -110,7 +110,7 @@ public class GammaDistributionGenerator implements Generator {
         Map<Integer, Integer> histogramData = new HashMap<>(20);
         List<Double> data = generatedRandomValues;
 
-        double boundInc = data.get(0) + data.get(data.size() - 1) / 20;
+        double boundInc = (data.get(data.size() - 1) - data.get(0)) / 20;
         double lowerBound = data.get(0);
         double upperBound = lowerBound + boundInc;
         int index = 0;
