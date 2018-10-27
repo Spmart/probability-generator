@@ -78,6 +78,7 @@ public class UniformDistributionGenerator implements Generator {
     private double getStatCentralMoment(int num) {
         double centralMoment = 0.0;
         int generatedValuesCount = generatedRandomValues.size();
+
         for (double d : generatedRandomValues) {
             centralMoment += Math.pow(d - Mean, num);
         }

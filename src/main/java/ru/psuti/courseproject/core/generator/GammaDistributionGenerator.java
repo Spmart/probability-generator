@@ -9,18 +9,18 @@ import java.util.*;
  * author chillurbrain
  */
 public class GammaDistributionGenerator implements Generator {
-    private static final double SHAPE = 2.0; // Форма (k)
-    private static final double SCALE = 0.5; // Размер (theta)
-    private static final double MEAN = SHAPE * SCALE;
-    private static final double SIGMA = Math.sqrt(SHAPE * Math.pow(SCALE, 2));
     private List<Double> generatedRandomValues; // Список сгенерированных случайных величин
     private List<CalculatedDataObject> calculatedData; // Список объектов рассчитанных величин
     private GammaDistribution gammaDistribution; // Закон распределения
+    private double shape, scale, sigma;
 
-    public GammaDistributionGenerator() {
+    public GammaDistributionGenerator(double shape, double scale) {
+        this.shape = shape;
+        this.scale = scale;
+        this.sigma = Math.sqrt(shape * Math.pow(scale, 2));
         generatedRandomValues = new ArrayList<>();
         calculatedData = new ArrayList<>();
-        gammaDistribution = new GammaDistribution(SHAPE, SCALE);
+        gammaDistribution = new GammaDistribution(shape, scale);
     }
 
     public List<Double> getGeneratedRandomValues(int sampleSize) {
@@ -35,23 +35,23 @@ public class GammaDistributionGenerator implements Generator {
 
 
     public List<CalculatedDataObject> getCalculatedData() {
-        double a1Theo = SHAPE * SCALE; // Математическое ожидание (a1)
+        double a1Theo = shape * scale; // Математическое ожидание (a1)
         double a1Stat = getStatMoment(1); // Сумма частного случайной величины к общему количеству случайных величин. (a1)
 
-        double m2Theo = SHAPE * Math.pow(SCALE, 2);
+        double m2Theo = shape * Math.pow(scale, 2);
         double m2Stat = getStatCentralMoment(2);
 
-        double m3Theo = 2.0 / Math.sqrt(SHAPE) * Math.pow(SIGMA, 3);
+        double m3Theo = 2.0 / Math.sqrt(shape) * Math.pow(sigma, 3);
         double m3Stat = getStatCentralMoment(3);
 
-        double m4Theo = (6.0 / SHAPE + 3.0) * Math.pow(SIGMA, 4);
+        double m4Theo = (6.0 / shape + 3.0) * Math.pow(sigma, 4);
         double m4Stat = getStatCentralMoment(4);
 
-        double AsTheo = 2.0 / Math.sqrt(SHAPE);
-        double AsStat = m3Stat / Math.pow(SIGMA, 3);
+        double AsTheo = 2.0 / Math.sqrt(shape);
+        double AsStat = m3Stat / Math.pow(sigma, 3);
 
-        double EkTheo = 6.0 / SHAPE;
-        double EkStat = (m4Stat / Math.pow(SIGMA, 4)) - 3;
+        double EkTheo = 6.0 / shape;
+        double EkStat = (m4Stat / Math.pow(sigma, 4)) - 3;
 
         double chi2 = getChi2();
 
@@ -81,10 +81,11 @@ public class GammaDistributionGenerator implements Generator {
 
     private double getStatCentralMoment(int order) {
         double centralMoment = 0.0;
+        double mean = getMean(generatedRandomValues);
         int generatedValuesCount = generatedRandomValues.size();
 
         for (double d : generatedRandomValues) {
-            centralMoment += Math.pow(d - MEAN, order);
+            centralMoment += Math.pow(d - mean, order);
         }
 
         centralMoment /= generatedValuesCount;
@@ -130,5 +131,13 @@ public class GammaDistributionGenerator implements Generator {
         }
 
         return histogramData;
+    }
+
+    private double getMean(List<Double> generatedRandomValues) {
+        double mean = 0.0;
+        for (double randomValue : generatedRandomValues) {
+            mean += randomValue;
+        }
+        return mean / generatedRandomValues.size();
     }
 }

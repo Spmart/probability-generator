@@ -41,15 +41,28 @@ public class Controller {
     @FXML
     private TextField sampleSizeTextField;
     @FXML
+    private TextField firstParamTextField;
+    @FXML
+    private TextField secondParamTextField;
+    @FXML
     private BarChart<?, ?> histogramChart;
     @FXML
     private ComboBox<String> distributionComboBox;
 
     private int sampleSize;
-
+    private double firstParam;
+    private double secondParam;
 
     @FXML
     public void initialize() {
+        setupLayout();
+        hideParamFields();
+        handleComboBoxOnAction();
+        handelOkButtonOnAction();
+        handleSampleSizeTextFieldOnAction();
+    }
+
+    private void setupLayout() {
         histogramChart.setBarGap(0);
         histogramChart.setCategoryGap(0);
 
@@ -64,34 +77,114 @@ public class Controller {
                 EXPONENTIAL_DISTRIBUTION,
                 UNIFORM_DISTRIBUTION
         );
+    }
 
+    private void hideParamFields() {
+        firstParamTextField.setVisible(false);
+        secondParamTextField.setVisible(false);
+    }
 
+    private void handleComboBoxOnAction() {
         distributionComboBox.setOnAction(event -> {
             if (sampleSizeTextField.getText() != null || sampleSizeTextField.getText().length() > 0) {
                 sampleSizeTextField.setDisable(false);
                 okButton.setDisable(false);
             }
-        });
-
-        okButton.setOnAction(event -> {
-            showHistogram();
-        });
-
-        sampleSizeTextField.setOnAction(event -> {
-            showHistogram();
+            hideParamFields();
+            switch (distributionComboBox.getValue()) {
+                case GAMMA_DISTRIBUTION:
+                    resetParamField();
+                    // Важно! Для текстового поля следует задать подсказку, что это за параметр, чтобы не городить
+                    // кучу меток.
+                    firstParamTextField.setVisible(true);
+                    firstParamTextField.setPromptText("Форма");
+                    secondParamTextField.setVisible(true);
+                    secondParamTextField.setPromptText("Размер");
+                    break;
+                case NORMAL_DISTRIBUTION:
+                    break;
+                case LOGNORMAL_DISTRIBUTION:
+                    break;
+                case UNIFORM_DISTRIBUTION:
+                    break;
+                default:
+                    break;
+            }
         });
     }
 
+
+    private void handelOkButtonOnAction() {
+        okButton.setOnAction(event -> showHistogram());
+    }
+
+    private void handleSampleSizeTextFieldOnAction() {
+        sampleSizeTextField.setOnAction(event -> showHistogram());
+    }
+
+    private void resetParamField() {
+        firstParamTextField.setText("");
+        secondParamTextField.setText("");
+        firstParam = 0.0;
+        secondParam = 0.0;
+    }
+
+    private void updateTable(Generator generator) {
+
+        ObservableList<CalculatedDataObject> calculatedDataObjects =
+                FXCollections.observableArrayList(generator.getCalculatedData());
+        dataTable.setItems(FXCollections.observableArrayList(calculatedDataObjects));
+        labelColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getParamName()));
+        statColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                String.format("%.3f", cellData.getValue().getParamValueStat()))
+        );
+        theoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getParamValueTheo() == null ? "" :
+                        String.format("%.3f", cellData.getValue().getParamValueTheo())
+        ));
+    }
+
+    private void setupHistogram(Generator generator) {
+        Map<Integer, Integer> histogramData = getHistogramData(generator);
+
+        XYChart.Series chartSeries = new XYChart.Series();
+        for (Integer key : histogramData.keySet()) {
+            chartSeries.getData().addAll(new XYChart.Data<>(String.valueOf(key + 1), histogramData.get(key)));
+        }
+        histogramChart.getData().clear();
+        histogramChart.getData().addAll(chartSeries);
+    }
+
     private void showHistogram() {
+        // Валидатор текстового поля "Объем выборки"
         if (sampleSizeTextField.getText().matches("^\\d+$")) {
             sampleSize = Integer.parseInt(sampleSizeTextField.getText());
         } else {
             return;
         }
+
+        // Для корректной работы приложения необходимо следить за видимостью полей. Если требуется один параметр, то
+        // следует установить setVisible(true) у firstParamTextField.
+
+        // Валидатор текстового поля первого параметра
+        if (firstParamTextField.isVisible() && isFirstParamValid()) {
+            firstParam = Double.valueOf(firstParamTextField.getText());
+        } else {
+            return;
+        }
+
+        // Вадидатор текстового поля второго параметра
+        if (secondParamTextField.isVisible() && isSecondParamsValid()) {
+            secondParam = Double.valueOf(secondParamTextField.getText());
+        } else {
+            return;
+        }
+
         if (distributionComboBox.getValue() != null) {
             switch (distributionComboBox.getValue()) {
                 case GAMMA_DISTRIBUTION:
-                    GammaDistributionGenerator gammaDistributionGenerator = new GammaDistributionGenerator();
+                    GammaDistributionGenerator gammaDistributionGenerator = new GammaDistributionGenerator(
+                            firstParam, secondParam);
                     setupHistogram(gammaDistributionGenerator);
                     updateTable(gammaDistributionGenerator);
                     break;
@@ -115,32 +208,6 @@ public class Controller {
                     break;
             }
         }
-    }
-
-    private void updateTable(Generator generator) {
-
-        ObservableList<CalculatedDataObject> calculatedDataObjects =
-                FXCollections.observableArrayList(generator.getCalculatedData());
-        dataTable.setItems(FXCollections.observableArrayList(calculatedDataObjects));
-        labelColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getParamName()));
-        statColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                String.format("%.3f", cellData.getValue().getParamValueStat()))
-        );
-        theoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                cellData.getValue().getParamValueTheo() == null ? "" :
-                String.format("%.3f", cellData.getValue().getParamValueTheo())
-        ));
-    }
-
-    private void setupHistogram(Generator generator) {
-        Map<Integer, Integer> histogramData = getHistogramData(generator);
-
-        XYChart.Series chartSeries = new XYChart.Series();
-        for (Integer key : histogramData.keySet()) {
-            chartSeries.getData().addAll(new XYChart.Data<>(String.valueOf(key+1), histogramData.get(key)));
-        }
-        histogramChart.getData().clear();
-        histogramChart.getData().addAll(chartSeries);
     }
 
     private Map<Integer, Integer> getHistogramData(Generator generator) {
@@ -171,5 +238,13 @@ public class Controller {
         sum += count;
 
         return sum == sampleSize ? histogramData : new HashMap<>();
+    }
+
+    private boolean isSecondParamsValid() {
+        return secondParamTextField.getText().matches("^[0-9]+(\\.[0-9]+)?$");
+    }
+
+    private boolean isFirstParamValid() {
+        return firstParamTextField.getText().matches("^[0-9]+(\\.[0-9]+)?$");
     }
 }
