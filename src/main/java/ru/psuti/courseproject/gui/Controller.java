@@ -56,7 +56,7 @@ public class Controller {
     @FXML
     public void initialize() {
         setupLayout();
-        hideParamFields();
+        showParamFields(false);
         handleComboBoxOnAction();
         handelOkButtonOnAction();
         handleSampleSizeTextFieldOnAction();
@@ -79,9 +79,9 @@ public class Controller {
         );
     }
 
-    private void hideParamFields() {
-        firstParamTextField.setVisible(false);
-        secondParamTextField.setVisible(false);
+    private void showParamFields(boolean visible) {
+        firstParamTextField.setVisible(visible);
+        secondParamTextField.setVisible(visible);
     }
 
     private void handleComboBoxOnAction() {
@@ -90,7 +90,7 @@ public class Controller {
                 sampleSizeTextField.setDisable(false);
                 okButton.setDisable(false);
             }
-            hideParamFields();
+            showParamFields(false);
             switch (distributionComboBox.getValue()) {
                 case GAMMA_DISTRIBUTION:
                     resetParamField();
@@ -169,20 +169,26 @@ public class Controller {
         // Валидатор текстового поля первого параметра
         if (firstParamTextField.isVisible() && isFirstParamValid()) {
             firstParam = Double.valueOf(firstParamTextField.getText());
-        } else {
-            return;
         }
 
         // Вадидатор текстового поля второго параметра
         if (secondParamTextField.isVisible() && isSecondParamsValid()) {
             secondParam = Double.valueOf(secondParamTextField.getText());
-        } else {
-            return;
         }
 
         if (distributionComboBox.getValue() != null) {
             switch (distributionComboBox.getValue()) {
                 case GAMMA_DISTRIBUTION:
+                    if (firstParam <= 0) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "Параметр формы меньше или равен 0");
+                        alert.showAndWait();
+                        return;
+                    }
+                    if (secondParam <= 0) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "Параметр размера меньше или равен 0");
+                        alert.showAndWait();
+                        return;
+                    }
                     GammaDistributionGenerator gammaDistributionGenerator = new GammaDistributionGenerator(
                             firstParam, secondParam);
                     setupHistogram(gammaDistributionGenerator);
