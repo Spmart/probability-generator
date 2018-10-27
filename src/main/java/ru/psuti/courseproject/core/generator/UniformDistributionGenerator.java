@@ -7,8 +7,8 @@ import java.util.*;
 
 public class UniformDistributionGenerator implements Generator {
 
-    private static final double LeftLimit = 2.0; // Левая граница
-    private static final double RightLimit = 17.5; // Правая граница
+    private static final double LeftLimit = 0.0; // Левая граница
+    private static final double RightLimit = 1.0; // Правая граница
     private static final double Mean = (LeftLimit + RightLimit) / 2;
     private List<Double> generatedRandomValues;  // Список сгенерированных случайных величин
     private List<CalculatedDataObject> calculatedData;  // Список объектов рассчитанных величин
