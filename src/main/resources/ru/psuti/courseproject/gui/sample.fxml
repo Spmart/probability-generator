@@ -17,24 +17,10 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="497.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.psuti.courseproject.gui.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.psuti.courseproject.gui.Controller">
    <children>
       <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <VBox prefHeight="475.0" prefWidth="400.0">
-               <children>
-                  <TableView fx:id="dataTable" prefHeight="486.0" prefWidth="400.0">
-                    <columns>
-                      <TableColumn fx:id="labelColumn" editable="false" prefWidth="70.0" text="Значение" />
-                      <TableColumn fx:id="theoColumn" editable="false" prefWidth="160.0" text="Теоретические" />
-                        <TableColumn fx:id="statColumn" editable="false" prefWidth="160.0" text="Статистические" />
-                    </columns>
-                     <VBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </VBox.margin>
-                  </TableView>
-               </children>
-            </VBox>
             <VBox fx:id="chartVbox" prefHeight="600.0" prefWidth="400.0">
                <children>
                   <BarChart fx:id="histogramChart" title="График распределения СВ">
@@ -45,6 +31,20 @@
                       <NumberAxis fx:id="yAxis" side="LEFT" />
                     </yAxis>
                   </BarChart>
+               </children>
+            </VBox>
+            <VBox prefHeight="475.0" prefWidth="400.0">
+               <children>
+                  <TableView fx:id="dataTable" prefHeight="300.0" prefWidth="400.0">
+                    <columns>
+                      <TableColumn fx:id="labelColumn" editable="false" prefWidth="70.0" text="Значение" />
+                      <TableColumn fx:id="theoColumn" editable="false" prefWidth="160.0" text="Теоретические" />
+                        <TableColumn fx:id="statColumn" editable="false" prefWidth="160.0" text="Статистические" />
+                    </columns>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </TableView>
                   <GridPane>
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="150.0" />
@@ -53,11 +53,11 @@
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label alignment="CENTER_RIGHT" contentDisplay="TOP" text="Объем выборки" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                        <Label text="Закон распределения" GridPane.halignment="RIGHT" />
-                        <TextField fx:id="sampleSizeTextField" maxWidth="180.0" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="Закон распределения" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                        <TextField fx:id="sampleSizeTextField" maxWidth="180.0" prefWidth="180.0" promptText="Объем выборки" GridPane.rowIndex="1">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -65,41 +65,28 @@
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </TextField>
-                        <Button fx:id="okButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="55.0" text="ОК" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-                           <GridPane.margin>
-                              <Insets left="5.0" right="5.0" />
-                           </GridPane.margin>
-                        </Button>
                         <ComboBox fx:id="distributionComboBox" prefWidth="250.0" GridPane.columnIndex="1">
                            <GridPane.margin>
                               <Insets left="5.0" right="5.0" />
                            </GridPane.margin>
                         </ComboBox>
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <children>
+                              <TextField fx:id="firstParamTextField" />
+                              <TextField fx:id="secondParamTextField" />
+                              <Button fx:id="okButton" alignment="CENTER" contentDisplay="CENTER" minWidth="55.0" mnemonicParsing="false" prefWidth="55.0" text="ОК" textAlignment="CENTER" />
+                           </children>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets right="5.0" />
+                           </padding>
+                        </HBox>
                      </children>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
-                  </GridPane>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <TextField fx:id="firstParamTextField">
-                           <GridPane.margin>
-                              <Insets left="5.0" top="5.0" />
-                           </GridPane.margin>
-                        </TextField>
-                        <TextField fx:id="secondParamTextField" GridPane.columnIndex="1">
-                           <GridPane.margin>
-                              <Insets left="5.0" right="5.0" top="5.0" />
-                           </GridPane.margin>
-                        </TextField>
-                     </children>
                   </GridPane>
                </children>
             </VBox>
